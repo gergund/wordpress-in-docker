@@ -1,0 +1,49 @@
+version: '3'
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx.Dockerfile
+    networks:
+      - wordpress
+    volumes:
+      - ".:/app"
+    hostname: nginx
+    depends_on: 
+      - php-fpm
+    ports: 
+      - 80:80
+    container_name: wordpress-nginx
+
+  php-fpm:
+    build: 
+      context: . 
+      dockerfile: php-fpm.Dockerfile
+    networks:
+      - wordpress
+    volumes:
+      - ".:/app"
+    hostname: php-fpm
+    depends_on:
+      - mysql
+    container_name: wordpress-php-fpm
+
+  mysql:
+    image: mysql:5.6
+    networks:
+      - wordpress
+    environment:
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=wordpress
+    volumes:
+      - mysql_data:/var/lib/mysql
+    hostname: mysql
+    container_name: wordpress-mysql
+
+networks: 
+  wordpress:
+
+volumes:
+  mysql_data:
